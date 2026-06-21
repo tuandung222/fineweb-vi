@@ -5,26 +5,26 @@ sidebar_label: 'Gán nhãn Llama 3'
 
 ## Gán nhãn chất lượng giáo dục ở quy mô lớn
 
-Để thực hiện việc gán nhãn chất lượng giáo dục trên quy mô lớn, chúng tôi đã sử dụng [Llama-3-70B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-70B-Instruct) để gán nhãn cho 500.000 mẫu dữ liệu từ 🍷 FineWeb, chấm điểm chất lượng giáo dục của từng mẫu theo thang điểm từ 0 đến 5.
+Để gán nhãn chất lượng giáo dục ở quy mô lớn, chúng tôi dùng [Llama-3-70B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-70B-Instruct) để chấm điểm 500.000 mẫu từ 🍷 FineWeb theo thang 0–5.
 
-### Thử nghiệm với các mô hình trọng số mở
+### Thử nghiệm với các mô hình open-weight
 
-Về các mô hình trọng số mở (open-weight models) được sử dụng để gán nhãn dữ liệu, chúng tôi đã thử nghiệm nhiều mô hình khác nhau bao gồm:
+Chúng tôi đã thử nghiệm nhiều mô hình open-weight để gán nhãn, bao gồm:
 - [Mixtral-8x7B-Instruct](https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1)
 - [Mixtral-8x22B-Instruct](https://huggingface.co/mistralai/Mixtral-8x22B-Instruct-v0.1)
 - [Llama-3-70B-Instruct](https://huggingface.co/meta-llama/Meta-Llama-3-70B-Instruct)
-- Một cơ chế hội đồng giám khảo (jury) tập hợp điểm số từ cả ba mô hình trên[^verga2024replacing].
+- Một cơ chế jury tổng hợp điểm số từ cả ba mô hình trên[^verga2024replacing].
 
-Qua các thử nghiệm thực nghiệm, chúng tôi nhận thấy rằng việc sử dụng duy nhất Llama 3 mang lại kết quả đáng tin cậy nhất.
+Qua thực nghiệm, Llama 3 đơn lẻ cho kết quả đáng tin cậy nhất.
 
-### Gợi ý gán nhãn tập trung vào cấp học phổ thông
+### Prompt gán nhãn tập trung vào cấp học phổ thông
 
-Để tự động gán nhãn, chúng tôi đã thiết kế một gợi ý (prompt) chi tiết. Gợi ý này hướng dẫn mô hình tập trung đánh giá dựa trên mức độ phù hợp của kiến thức với học sinh cấp tiểu học và trung học cơ sở (grade-school và middle-school), giúp tránh việc thiên vị các tài liệu học thuật quá chuyên sâu (như các bài đăng trên arXiv).
+Để gán nhãn tự động, chúng tôi thiết kế một prompt chi tiết hướng dẫn mô hình đánh giá dựa trên mức độ phù hợp với học sinh tiểu học và trung học cơ sở — giúp tránh thiên vị đối với các tài liệu học thuật quá chuyên sâu (như bài đăng trên arXiv).
 
 <div className="main-plot-container">
   <figure>
     <img src="https://cdn-uploads.huggingface.co/production/uploads/61c141342aac764ce1654e43/fjZQ4izIj1rx1xQnBTKKr.png" alt="Gợi ý gán nhãn cho LLM" />
-    <figcaption>Gợi ý (prompt) được sử dụng cho các nhãn gán điểm giáo dục bằng Llama 3, bạn cũng có thể xem tại [đây](https://huggingface.co/HuggingFaceFW/fineweb-edu-classifier/blob/main/utils/prompt.txt).</figcaption>
+    <figcaption>Prompt được dùng để gán điểm giáo dục bằng Llama 3, xem thêm [tại đây](https://huggingface.co/HuggingFaceFW/fineweb-edu-classifier/blob/main/utils/prompt.txt).</figcaption>
   </figure>
 </div>
 

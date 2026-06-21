@@ -7,57 +7,57 @@ sidebar_label: 'Nghịch lý Loại trùng'
 
 ### Càng loại trùng nhiều càng tốt, đúng không?
 
-Ban đầu, chúng tôi hoạt động dưới giả định rằng *càng loại bỏ trùng lặp nhiều thì càng tốt*, nên hướng tiếp cận đầu tiên là gộp toàn bộ tập dữ liệu (hơn 90 đợt crawl) lại và tiến hành loại trùng chéo chung như một tập dữ liệu lớn duy nhất bằng MinHash.
+Ban đầu, chúng tôi hoạt động theo giả định *càng deduplication nhiều thì càng tốt*. Hướng tiếp cận đầu tiên là gộp toàn bộ tập dữ liệu (hơn 90 đợt crawl) lại và deduplication chéo chung như một tập dữ liệu lớn duy nhất bằng MinHash.
 
-Chúng tôi thực hiện việc này theo phương pháp lặp (iterative): bắt đầu từ đợt crawl gần nhất (lúc đó là `2023-50`) và thực hiện ngược thời gian cho đến đợt crawl cũ nhất. Chúng tôi loại trùng cho từng đợt crawl không chỉ trong nội bộ chính nó, mà còn loại bỏ bất kỳ tài liệu nào khớp với các tài liệu trong các đợt crawl đã được xử lý trước đó (tức là loại trùng chéo giữa các đợt crawl - cross-dump deduplication)[^cross_dump_note].
+Chúng tôi thực hiện theo phương pháp lặp: bắt đầu từ đợt crawl gần nhất (lúc đó là `2023-50`) và lùi dần về đợt cũ nhất. Mỗi đợt crawl được deduplication không chỉ trong nội bộ, mà còn loại bỏ bất kỳ tài liệu nào khớp với các đợt crawl đã xử lý trước (cross-dump deduplication)[^cross_dump_note].
 
-Ví dụ, đối với đợt crawl gần đây thứ hai (lúc đó là `2023-40`), chúng tôi đã loại trùng nó với đợt crawl gần nhất bên cạnh việc loại trùng nội bộ. Kết quả là, đợt crawl càng cũ thì số lượng các đợt crawl đối chiếu để loại trùng càng nhiều, và lượng dữ liệu bị loại bỏ khỏi nó càng lớn (thực tế, ở các đợt crawl cũ nhất, bước loại trùng đã xóa bỏ hơn 90% lượng dữ liệu sau khi lọc cơ bản).
+Ví dụ, đợt crawl gần thứ hai (`2023-40`) được deduplication với cả đợt gần nhất lẫn nội bộ. Hệ quả là đợt càng cũ thì số đợt đối chiếu càng nhiều, và lượng dữ liệu bị loại càng lớn (thực tế, với các đợt crawl cũ nhất, bước deduplication đã xóa hơn 90% dữ liệu sau base filtering).
 
-Việc loại trùng tập dữ liệu theo cách này tạo ra một tập dữ liệu gồm 4 nghìn tỷ token. Tuy nhiên, một điều khá bất ngờ là khi huấn luyện trên một tập con mẫu ngẫu nhiên gồm 350 tỷ token, các mô hình thử nghiệm loại trừ (ablation models) của chúng tôi hầu như không cho thấy sự cải thiện nào so với mô hình huấn luyện trên dữ liệu chưa loại trùng, và đạt điểm số thấp hơn nhiều so với tập dữ liệu tiền nhiệm RefinedWeb trên tổ hợp các bài toán đánh giá của chúng tôi:
+Phương pháp này tạo ra tập dữ liệu 4 nghìn tỷ token. Tuy nhiên, kết quả khá bất ngờ: khi huấn luyện trên subset ngẫu nhiên 350 tỷ token, các ablation model hầu như không cho thấy cải thiện nào so với mô hình huấn luyện trên dữ liệu chưa deduplication, và đạt điểm số thấp hơn nhiều so với RefinedWeb:
 
-![Hiệu suất tệ của việc loại trùng tất cả đợt crawl](https://huggingfacefw-blogpost-fineweb-v1.static.hf.space/assets/images/dedup_all_dumps_bad.png)
+![Hiệu suất tệ của việc deduplication tất cả đợt crawl](https://huggingfacefw-blogpost-fineweb-v1.static.hf.space/assets/images/dedup_all_dumps_bad.png)
 
-Kết quả này đã thách thức giả định của chúng tôi rằng việc loại trùng nhiều hơn chắc chắn sẽ mang lại điểm số đánh giá cao hơn. Vì vậy, chúng tôi quyết định xem xét kỹ hơn một trong những đợt crawl cũ nhất, cụ thể là đợt `2013-48`:
+Kết quả này thách thức giả định rằng deduplication nhiều hơn thì điểm đánh giá sẽ cao hơn. Chúng tôi quyết định xem xét kỹ hơn một trong những đợt crawl cũ nhất, cụ thể là `2013-48`:
 
-* Trước khi loại trùng, đợt crawl này có khoảng 490 tỷ token.
-* Sau quá trình MinHash lặp của chúng tôi, chỉ còn lại khoảng 31 tỷ token (94% dữ liệu đã bị loại bỏ).
+* Trước khi deduplication, đợt crawl này có khoảng 490 tỷ token.
+* Sau iterative MinHash, chỉ còn khoảng 31 tỷ token (94% dữ liệu đã bị loại bỏ).
 
-Để làm thí nghiệm, chúng tôi đã thử huấn luyện hai mô hình trên 28 tỷ token được lấy mẫu từ các phần dữ liệu sau của đợt crawl `2013-48`:
+Để kiểm tra, chúng tôi huấn luyện hai mô hình trên 28 tỷ token được lấy mẫu từ hai phần của đợt crawl `2013-48`:
 
-* Phần dữ liệu được giữ lại sau khi loại trùng hoàn toàn, khoảng 31 tỷ token (*dữ liệu giữ lại ban đầu - originally kept data*).
-* 171 tỷ token thu được bằng cách loại trùng riêng lẻ (không xét đến các đợt crawl khác) từ khoảng 460 tỷ token đã bị loại bỏ khỏi đợt crawl này trong quá trình loại trùng chéo lặp đi lặp lại (*dữ liệu bị loại bỏ ban đầu - originally removed data*)[^overlap_note].
+* Phần dữ liệu được giữ lại sau deduplication hoàn toàn, khoảng 31 tỷ token (*originally kept data*).
+* 171 tỷ token thu được bằng cách deduplication riêng lẻ (không xét đến các đợt crawl khác) từ khoảng 460 tỷ token đã bị loại bỏ trong quá trình cross deduplication (*originally removed data*)[^overlap_note].
 
 ![Hiệu suất của dữ liệu bị loại bỏ](https://huggingfacefw-blogpost-fineweb-v1.static.hf.space/assets/images/removed_data_cross_dedup.png)
 
-Các kết quả này cho thấy đối với đợt crawl cũ này khi xét riêng lẻ, phần dữ liệu được giữ lại (chiếm 10% dữ liệu gốc) thực chất lại *tệ hơn* so với 90% dữ liệu mà chúng tôi đã loại bỏ[^independent_note]. Điều này cũng được xác nhận qua kiểm tra trực quan: *dữ liệu giữ lại ban đầu* chứa nhiều quảng cáo, danh sách từ khóa và văn bản định dạng lỗi hơn nhiều so với *dữ liệu bị loại bỏ ban đầu*.
+Kết quả cho thấy đối với đợt crawl cũ này, phần dữ liệu được giữ lại (10% dữ liệu gốc) thực chất *tệ hơn* so với 90% dữ liệu bị loại bỏ[^independent_note]. Điều này được xác nhận qua kiểm tra trực quan: *originally kept data* chứa nhiều quảng cáo, danh sách từ khóa và văn bản định dạng lỗi hơn nhiều so với *originally removed data*.
 
-### Lùi lại một bước: Loại trùng riêng lẻ cho từng đợt crawl
+### Lùi lại một bước: Deduplication riêng lẻ cho từng đợt crawl
 
-Chúng tôi quyết định thử nghiệm một hướng tiếp cận khác: loại trùng bằng MinHash cho từng đợt crawl một cách riêng lẻ (độc lập với các đợt crawl khác). Hướng đi này giúp thu được một tập dữ liệu quy mô 20 nghìn tỷ token.
+Chúng tôi quyết định thử một hướng khác: deduplication MinHash cho từng đợt crawl một cách độc lập. Cách này giúp thu được tập dữ liệu 20 nghìn tỷ token.
 
-Khi huấn luyện trên một mẫu ngẫu nhiên từ tập dữ liệu này, chúng tôi thấy rằng hiệu suất của nó hiện tại đã ngang bằng với RefinedWeb:
+Khi huấn luyện trên sample ngẫu nhiên từ tập này, hiệu suất đã ngang bằng với RefinedWeb:
 
-![Hiệu suất của loại trùng độc lập tốt hơn](https://huggingfacefw-blogpost-fineweb-v1.static.hf.space/assets/images/cross_ind_unfiltered_comparison.png)
+![Hiệu suất của deduplication độc lập tốt hơn](https://huggingfacefw-blogpost-fineweb-v1.static.hf.space/assets/images/cross_ind_unfiltered_comparison.png)
 
-Chúng tôi đưa ra giả thuyết rằng sự cải thiện chính thu được từ loại trùng là do loại bỏ các cụm trùng lặp rất lớn xuất hiện trong mọi đợt crawl (bạn có thể tìm thấy một số ví dụ về các cụm này trong bài viết về RefinedWeb, mỗi cụm chứa *hàng trăm nghìn* tài liệu) và việc loại trùng sâu hơn đối với các cụm có tần suất trùng lặp thấp (dưới khoảng 100 lần, tương ứng với số lượng đợt crawl) trên thực tế lại gây hại cho hiệu suất: dữ liệu không tìm thấy bản trùng lặp nào ở các đợt crawl khác thực chất có thể có chất lượng kém hơn hoặc lệch xa khỏi phân phối chuẩn (out-of-distribution) (như đã được minh chứng bởi kết quả trên dữ liệu đợt `2013-48`).
+Chúng tôi đưa ra giả thuyết rằng lợi ích chính của deduplication đến từ việc loại bỏ các cụm trùng lặp rất lớn xuất hiện trong mọi đợt crawl (có thể tìm thấy một số ví dụ trong bài viết về RefinedWeb, mỗi cụm chứa *hàng trăm nghìn* tài liệu). Việc deduplication sâu hơn đối với các cụm có tần suất trùng lặp thấp (dưới khoảng 100 lần, tương ứng số đợt crawl) thực tế lại gây hại: dữ liệu không tìm thấy bản trùng lặp ở các đợt khác có thể có chất lượng kém hơn hoặc lệch khỏi phân phối chuẩn (như đã thấy với đợt `2013-48`).
 
-Mặc dù bạn có thể thấy một số cải thiện hiệu suất khi loại trùng một vài đợt crawl cùng nhau, nhưng ở quy mô của toàn bộ tập dữ liệu (tất cả các đợt crawl), tác dụng phụ từ việc vô tình tăng tần suất của dữ liệu chất lượng kém (upsampling of lower quality data) có vẻ có sức ảnh hưởng lớn hơn.
+Mặc dù có thể thấy cải thiện khi deduplication một vài đợt crawl cùng nhau, nhưng ở quy mô toàn bộ tập dữ liệu, tác dụng phụ từ việc vô tình tăng tần suất của dữ liệu chất lượng thấp có vẻ chiếm ưu thế.
 
-Một khả năng cần xem xét là khi chất lượng của bộ lọc được cải thiện, hiệu ứng phụ này có thể không còn phổ biến nữa, vì các bộ lọc có thể loại bỏ bớt phần dữ liệu chất lượng thấp này. Chúng tôi cũng đã thử nghiệm áp dụng các phương pháp loại trùng khác nhau, thường là "nhẹ" hơn, trên các đợt crawl đã được loại trùng riêng lẻ. Bạn có thể đọc thêm về các thử nghiệm đó ở phần dưới.
+Một điều cần xem xét là khi bộ lọc được cải thiện, hiệu ứng phụ này có thể không còn phổ biến nữa. Chúng tôi cũng đã thử nghiệm các phương pháp deduplication khác, thường “nhẹ” hơn, trên các đợt crawl đã được deduplication riêng lẻ — chi tiết ở phần dưới.
 
-### Ghi chú về việc đo lường tác động của loại bỏ trùng lặp
+### Ghi chú về đo lường tác động của deduplication
 
-Do đặc thù của việc loại trùng, tác động của nó không phải lúc nào cũng rõ rệt trong một lát cắt dữ liệu nhỏ (chẳng hạn như mức 28 tỷ token mà chúng tôi sử dụng cho các thử nghiệm loại trừ của bộ lọc). Hơn nữa, chúng ta cần cân nhắc việc tồn tại những tác động đặc thù khi tiến hành loại trùng trên toàn bộ các đợt crawl của CommonCrawl, vì một số URL hoặc trang web được thu thập lại từ đợt crawl này sang đợt crawl khác.
+Do đặc thù của deduplication, tác động của nó không phải lúc nào cũng rõ rệt trong một lát cắt dữ liệu nhỏ (như 28 tỷ token dùng cho ablation bộ lọc). Ngoài ra, cần cân nhắc các tác động đặc thù khi deduplication trên toàn bộ CommonCrawl, vì một số URL hoặc trang web được crawl lại từ đợt này sang đợt khác.
 
-Để hình dung tác động của việc tăng quy mô số lượng token huấn luyện lên việc đo lường hiệu quả loại trùng, chúng tôi đã xem xét một kịch bản lý thuyết sau (rất cực đoan và không thực tế so với mức độ trùng lặp thực tế ghi nhận được):
+Để hình dung tác động của việc tăng quy mô số token huấn luyện lên việc đo lường hiệu quả deduplication, chúng tôi xem xét kịch bản lý thuyết sau (đây là kịch bản cực đoan và không thực tế so với mức độ trùng lặp thực tế):
 
 * Có 100 đợt crawl CommonCrawl (gần đúng với thực tế).
-* Mỗi đợt crawl đã được loại trùng nội bộ một cách hoàn hảo (mỗi tài liệu là duy nhất trong đợt crawl đó).
-* Các đợt crawl là bản sao hoàn hảo của nhau (mức độ trùng lặp chéo tối đa giữa các đợt crawl, thực chất là kịch bản tồi tệ nhất).
-* Mỗi đợt crawl có 200 tỷ token (tổng cộng là 20 nghìn tỷ, tương đương kích thước thu được từ việc loại trùng riêng lẻ ở trên).
-* Mỗi đợt crawl được cấu thành từ các tài liệu có độ dài 1,000 token (200 triệu tài liệu mỗi đợt crawl).
+* Mỗi đợt đã được deduplication nội bộ hoàn hảo (mỗi tài liệu là duy nhất trong đợt đó).
+* Các đợt crawl là bản sao hoàn hảo của nhau (mức độ cross-crawl trùng lặp tối đa — kịch bản tồi tệ nhất).
+* Mỗi đợt có 200 tỷ token (tổng cộng 20 nghìn tỷ, tương đương kích thước thu được từ independent deduplication).
+* Mỗi đợt gồm các tài liệu có độ dài 1.000 token (200 triệu tài liệu mỗi đợt).
 
-Sau đó, chúng tôi mô phỏng việc lấy mẫu đồng đều các tài liệu từ toàn bộ tập dữ liệu 20 nghìn tỷ token này để thu được các tập con có kích thước 1B, 10B, 100B, 350B và 1T token. Trong biểu đồ dưới đây, bạn có thể thấy tần suất mỗi tài liệu bị lặp lại:
+Sau đó chúng tôi mô phỏng lấy mẫu đồng đều từ toàn bộ 20 nghìn tỷ token để thu các subset 1B, 10B, 100B, 350B và 1T token. Biểu đồ bên dưới cho thấy tần suất mỗi tài liệu bị lặp lại:
 
 ![Mô phỏng trùng lặp](https://huggingfacefw-blogpost-fineweb-v1.static.hf.space/assets/images/duplicates_simul.png)
 

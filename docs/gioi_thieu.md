@@ -19,20 +19,20 @@ sidebar_label: 'Giới thiệu'
 
 ---
 
-Hiệu suất của một mô hình ngôn ngữ lớn (LLM) phụ thuộc rất nhiều vào chất lượng và kích thước của tập dữ liệu tiền huấn luyện (pretraining) của nó. Tuy nhiên, các tập dữ liệu pretraining của những LLM mở tiên tiến nhất (state-of-the-art open LLMs) như Llama 3 và Mixtral lại không được công bố công khai, và chúng ta biết rất ít về cách chúng được tạo ra.
+Hiệu suất của một LLM phụ thuộc rất lớn vào chất lượng và kích thước tập dữ liệu pretraining. Tuy nhiên, tập dữ liệu pretraining của các LLM mở hàng đầu như Llama 3 hay Mixtral đều không được công bố — và chúng ta biết rất ít về cách chúng được xây dựng.
 
-> ⏱️ **Thời gian đọc:** 45 phút. Để có trải nghiệm đọc tốt nhất, chúng tôi khuyên bạn không nên sử dụng điện thoại di động.
+> ⏱️ **Thời gian đọc:** 45 phút. Để có trải nghiệm đọc tốt nhất, nên đọc trên máy tính thay vì điện thoại.
 
-Gần đây, chúng tôi đã phát hành [**🍷 FineWeb**](https://huggingface.co/datasets/HuggingFaceFW/fineweb), một tập dữ liệu mới, quy mô lớn (**15 nghìn tỷ token, dung lượng ổ đĩa 44TB**) dành cho tiền huấn luyện (pretraining) LLM. FineWeb được xây dựng từ 96 bản sao lưu (snapshot) CommonCrawl và giúp tạo ra các **mô hình có hiệu suất tốt hơn so với các tập dữ liệu pretraining mở khác**. Để mang lại sự minh bạch hơn trong lĩnh vực học máy (machine learning) và thúc đẩy sự hiểu biết chung mang tính mở về cách huấn luyện các mô hình ngôn ngữ lớn đạt chất lượng tốt, chúng tôi đã ghi chép lại một cách cẩn thận và thực hiện thử nghiệm loại trừ (ablation) đối với tất cả các lựa chọn thiết kế được sử dụng trong FineWeb, bao gồm cả các nghiên cứu chuyên sâu về chiến lược loại bỏ trùng lặp (deduplication) và lọc dữ liệu (filtering). Báo cáo kỹ thuật (technical report) chi tiết này đi sâu nghiên cứu cách tạo ra một tập dữ liệu quy mô web (web-scale) lớn và chất lượng cao cho pretraining LLM. Bản thân tập dữ liệu, 🍷 FineWeb, hiện đã có thể tải xuống tại [đây](https://huggingface.co/datasets/HuggingFaceFW/fineweb).
+Gần đây, chúng tôi đã phát hành [**🍷 FineWeb**](https://huggingface.co/datasets/HuggingFaceFW/fineweb) — tập dữ liệu pretraining quy mô lớn với **15 nghìn tỷ token, dung lượng 44TB**. FineWeb được xây dựng từ 96 snapshot của CommonCrawl và cho thấy **hiệu suất mô hình tốt hơn so với các tập dữ liệu pretraining mở hiện có**. Nhằm thúc đẩy tính minh bạch trong machine learning, chúng tôi ghi chép đầy đủ mọi lựa chọn thiết kế của FineWeb — bao gồm các nghiên cứu chuyên sâu về chiến lược deduplication và filtering. Báo cáo kỹ thuật này trình bày chi tiết cách xây dựng một tập dữ liệu web-scale chất lượng cao cho pretraining LLM. Tập dữ liệu 🍷 FineWeb có thể tải xuống tại [đây](https://huggingface.co/datasets/HuggingFaceFW/fineweb).
 
 > [!NOTE]
 > 📝 **Ghi chú**
-> Chúng tôi vô cùng biết ơn toàn bộ đội ngũ [distill.pub](https://distill.pub/) (đặc biệt là Christopher Olah, Shan Carter, Ludwig Schubert) vì đã tạo ra bản mẫu thiết kế (template) mà chúng tôi sử dụng làm nền tảng cho bài viết này. Xin cảm ơn vì đã truyền cảm hứng cho chúng tôi bằng những bài báo và bài viết được biên soạn vô cùng công phu.
+> Chúng tôi vô cùng biết ơn toàn bộ đội ngũ [distill.pub](https://distill.pub/) — đặc biệt là Christopher Olah, Shan Carter và Ludwig Schubert — vì đã tạo ra template làm nền tảng cho bài viết này, cũng như đã truyền cảm hứng qua những bài báo được biên soạn vô cùng công phu.
 
-Trong báo cáo kỹ thuật này, chúng tôi cũng giới thiệu [**📚 FineWeb-Edu**](https://huggingface.co/datasets/HuggingFaceFW/fineweb-edu), một tập con (subset) của FineWeb được xây dựng bằng cách sử dụng các nhãn gán chất lượng cao tự động và có khả năng mở rộng để đánh giá giá trị giáo dục. Tập dữ liệu này vượt qua tất cả các tập dữ liệu web mở hiện có trên một loạt các bài đánh giá (benchmark) giáo dục như MMLU, ARC, và OpenBookQA.
+Báo cáo này cũng giới thiệu [**📚 FineWeb-Edu**](https://huggingface.co/datasets/HuggingFaceFW/fineweb-edu) — một subset của FineWeb, được lọc bằng cách gán nhãn chất lượng giáo dục tự động và có thể mở rộng quy mô. Tập dữ liệu này vượt trội hơn tất cả các tập dữ liệu web mở hiện có trên một loạt benchmark giáo dục như MMLU, ARC và OpenBookQA.
 
-[📚 FineWeb-Edu](https://huggingface.co/datasets/HuggingFaceFW/fineweb-edu) hiện có sẵn ở hai kích thước/mức độ lọc: **1,3 nghìn tỷ token (nội dung giáo dục cực kỳ cao)** và **5,4 nghìn tỷ token (nội dung giáo dục cao)** (tất cả các token đều được đo lường bằng bộ phân tách từ (tokenizer) GPT2). Bạn có thể tải xuống tập dữ liệu này tại [đây](https://huggingface.co/datasets/HuggingFaceFW/fineweb-edu).
+[📚 FineWeb-Edu](https://huggingface.co/datasets/HuggingFaceFW/fineweb-edu) có hai phiên bản: **1,3 nghìn tỷ token** (nội dung có giá trị giáo dục rất cao) và **5,4 nghìn tỷ token** (nội dung có giá trị giáo dục cao), tất cả đo bằng tokenizer GPT2. Tải xuống tại [đây](https://huggingface.co/datasets/HuggingFaceFW/fineweb-edu).
 
-Cả hai tập dữ liệu đều được phát hành theo giấy phép [ODC-By 1.0](https://opendatacommons.org/licenses/by/1-0/) cho phép tự do sử dụng.
+Cả hai tập dữ liệu đều được phát hành theo giấy phép [ODC-By 1.0](https://opendatacommons.org/licenses/by/1-0/).
 
-**Tóm tắt nhanh (TLDR):** Bài viết này thảo luận về việc xử lý và đánh giá chất lượng dữ liệu ở quy mô lớn, công thức (recipe) 🍷 FineWeb (liệt kê và giải thích tất cả các lựa chọn thiết kế của chúng tôi), và quy trình được thực hiện để tạo ra tập con 📚 FineWeb-Edu của nó.
+**Tóm tắt (TLDR):** Bài viết trình bày quy trình xử lý và đánh giá chất lượng dữ liệu ở quy mô lớn, công thức xây dựng 🍷 FineWeb (kèm giải thích toàn bộ các lựa chọn thiết kế), và quy trình tạo ra subset 📚 FineWeb-Edu.

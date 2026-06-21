@@ -7,14 +7,14 @@ sidebar_label: 'Thu thập CommonCrawl'
 
 ## Tìm kiếm dữ liệu thô
 
-Một câu hỏi phổ biến thường gặp về các tập dữ liệu web được sử dụng để huấn luyện mô hình ngôn ngữ lớn (LLM) là "họ lấy tất cả số dữ liệu đó từ đâu?". Nhìn chung sẽ có hai lựa chọn:
+Câu hỏi thường gặp về các tập dữ liệu web dùng để huấn luyện LLM là "dữ liệu đó lấy từ đâu?". Nhìn chung có hai hướng:
 
-* Bạn tự mình thu thập dữ liệu (crawl), giống như cách các công ty như OpenAI hay Anthropic (và các bên khác) đang thực hiện (xem tại [đây](https://platform.openai.com/docs/gptbot) và [đây](https://darkvisitors.com/agents/claudebot)).
-* Bạn sử dụng kho lưu trữ công cộng của các trang web đã được thu thập, chẳng hạn như kho lưu trữ do tổ chức phi lợi nhuận [CommonCrawl](https://commoncrawl.org/) duy trì.
+* Tự thu thập dữ liệu (crawl), như cách OpenAI hay Anthropic đang làm (xem tại [đây](https://platform.openai.com/docs/gptbot) và [đây](https://darkvisitors.com/agents/claudebot)).
+* Dùng kho lưu trữ công khai các trang web đã được thu thập sẵn, chẳng hạn kho lưu trữ của tổ chức phi lợi nhuận [CommonCrawl](https://commoncrawl.org/).
 
-Để xây dựng 🍷 FineWeb, tiếp nối những gì các đội ngũ huấn luyện LLM đã thực hiện trước đây, chúng tôi sử dụng CommonCrawl (CC) làm điểm khởi đầu. Tổ chức phi lợi nhuận Common Crawl đã tiến hành thu thập dữ liệu web từ năm 2007 và phát hành các đợt crawl mới chứa từ 200 đến 400 TiB nội dung văn bản thu được qua quá trình thu thập web tự động, thường là sau mỗi 1 hoặc 2 tháng.
+Để xây dựng 🍷 FineWeb, chúng tôi dùng CommonCrawl (CC) làm điểm khởi đầu — cách tiếp cận phổ biến trong các đội ngũ huấn luyện LLM trước đây. CommonCrawl thu thập dữ liệu web từ năm 2007 và thường xuyên phát hành các đợt crawl mới chứa từ 200 đến 400 TiB văn bản, thường 1–2 tháng một lần.
 
-Ví dụ, đợt crawl CC gần đây nhất (tháng 4 năm 2024) chứa 2,7 tỷ trang web, với tổng cộng 386 TiB nội dung văn bản HTML chưa nén[^1]. Đã có 96 đợt crawl được phát hành kể từ năm 2013 và 3 đợt crawl từ năm 2008 đến năm 2012 vốn sử dụng định dạng khác (cũ hơn)[^2].
+Ví dụ, đợt crawl gần nhất (tháng 4/2024) chứa 2,7 tỷ trang web với tổng cộng 386 TiB HTML chưa nén[^1]. Tính từ năm 2013, đã có 96 đợt crawl được phát hành; ngoài ra còn 3 đợt từ năm 2008–2012 dùng định dạng cũ hơn[^2].
 
-[^1]: Lưu ý rằng kích thước thay đổi theo từng đợt crawl. Lưu ý thêm rằng chúng tôi sử dụng hai từ "dump" (bản sao lưu) và "crawl" (đợt crawl) thay thế cho nhau trong báo cáo kỹ thuật này.
+[^1]: Kích thước thay đổi theo từng đợt crawl. Trong báo cáo này, chúng tôi dùng "dump" và "crawl" thay thế cho nhau.
 [^2]: Chúng tôi không xử lý 3 đợt crawl cũ này.

@@ -5,17 +5,17 @@ sidebar_label: 'Kết luận & Trích dẫn'
 
 ## Kết luận và hướng đi tương lai
 
-Thông qua những nỗ lực thúc đẩy khoa học mở (open science), chúng tôi hy vọng sẽ tiếp tục vén màn chiếc hộp đen của quá trình huấn luyện các mô hình ngôn ngữ lớn (LLM) hiệu suất cao, đồng thời trao quyền cho mọi người xây dựng các mô hình tiên tiến nhất (state-of-the-art). Chúng tôi rất mong đợi được tiếp tục cải tiến FineWeb và phát hành các tập con dữ liệu web được lọc ngày càng chất lượng hơn theo cách hoàn toàn mở và có thể tái lập (reproducible).
+Qua những nỗ lực thúc đẩy khoa học mở, chúng tôi hy vọng sẽ tiếp tục giải mã hộp đen của quá trình huấn luyện các LLM hiệu suất cao, đồng thời trao quyền cho cộng đồng xây dựng các mô hình tiêu chuẩn state-of-the-art. Chúng tôi mong chờ tiếp tục cải tiến FineWeb và công bố các tập con dữ liệu web được lọc ngày càng chất lượng hơn theo hướng hoàn toàn mở và reproducible.
 
-Trong ngắn hạn, chúng tôi kỳ vọng sẽ áp dụng những bài học kinh nghiệm từ FineWeb (tiếng Anh) sang các ngôn ngữ khác. Mặc dù tiếng Anh hiện đang chiếm ưu thế trong bối cảnh LLM, chúng tôi tin rằng việc giúp cho dữ liệu web chất lượng cao bằng các ngôn ngữ khác trở nên dễ dàng tiếp cận nhất có thể sẽ mang lại tác động vô cùng to lớn.
+Trong ngắn hạn, chúng tôi kỳ vọng sẽ áp dụng những bài học từ FineWeb tiếng Anh sang các ngôn ngữ khác. Dù tiếng Anh hiện đang chiếm ưu thế trong bản đồ LLM, chúng tôi tin rằng việc giúp dữ liệu web chất lượng cao bằng các ngôn ngữ khác trở nên dễ tiếp cận hơn sẽ mang lại tác động rất lớn.
 
-Tóm lại: tương lai vô cùng tươi sáng và đầy thú vị cho việc nghiên cứu khoa học xây dựng các tập dữ liệu ở quy mô lớn và theo định hướng mở 🤗.
+Tóm lại: tương lai vô cùng tươi sáng cho việc nghiên cứu xây dựng các tập dữ liệu quy mô lớn theo định hướng mở 🤗.
 
 ---
 
 ## Trích dẫn
 
-Để ghi nhận đóng góp trong các bối cảnh học thuật, vui lòng trích dẫn công trình này dưới dạng:
+Để ghi nhận đóng góp trong các bối cảnh học thuật, vui lòng trích dẫn công trình này như sau:
 
 ```text
 Penedo, et al., "The FineWeb Datasets: Decanting the Web for the Finest Text Data at Scale", 2024.
